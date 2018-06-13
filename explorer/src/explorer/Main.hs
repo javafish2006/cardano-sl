@@ -23,8 +23,8 @@ import           Pos.Client.CLI (CommonNodeArgs (..), NodeArgs (..),
                      getNodeParams)
 import qualified Pos.Client.CLI as CLI
 import           Pos.Context (NodeContext (..))
-import           Pos.Core (Config (..), configGeneratedSecretsThrow, epochSlots)
-import           Pos.Crypto (ProtocolMagic)
+import           Pos.Core as Core (Config (..), configBlkSecurityParam,
+                     configEpochSlots, configGeneratedSecretsThrow)
 import           Pos.Explorer.DB (explorerInitDB)
 import           Pos.Explorer.ExtraContext (makeExtraCtx)
 import           Pos.Explorer.Socket (NotifierSettings (..))
@@ -68,18 +68,21 @@ action (ExplorerNodeArgs (cArgs@CommonNodeArgs{..}) ExplorerArgs{..}) =
 
         let vssSK = fromJust $ npUserSecret currentParams ^. usVss
         let sscParams = CLI.gtSscParams cArgs vssSK (npBehaviorConfig currentParams)
+        let epochSlots = configEpochSlots coreConfig
 
         let plugins :: [Diffusion ExplorerProd -> ExplorerProd ()]
             plugins =
-                [ explorerPlugin webPort
-                , notifierPlugin NotifierSettings{ nsPort = notifierPort }
+                [ explorerPlugin epochSlots webPort
+                , notifierPlugin epochSlots NotifierSettings {nsPort = notifierPort}
                 , updateTriggerWorker
                 ]
-        let pm = configProtocolMagic coreConfig
-        bracketNodeResources currentParams sscParams
-            (explorerTxpGlobalSettings pm txpConfig)
-            (explorerInitDB pm epochSlots) $ \nr@NodeResources {..} ->
-                runExplorerRealMode pm txpConfig nr (runNode pm txpConfig nr plugins)
+        bracketNodeResources
+            (configBlkSecurityParam coreConfig)
+            currentParams
+            sscParams
+            (explorerTxpGlobalSettings (configProtocolMagic coreConfig) txpConfig)
+            (explorerInitDB coreConfig) $ \nr@NodeResources {..} ->
+                runExplorerRealMode coreConfig txpConfig nr (runNode coreConfig txpConfig nr plugins)
   where
 
     blPath :: Maybe AssetLockPath
@@ -90,16 +93,16 @@ action (ExplorerNodeArgs (cArgs@CommonNodeArgs{..}) ExplorerArgs{..}) =
 
     runExplorerRealMode
         :: (HasConfigurations,HasCompileInfo)
-        => ProtocolMagic
+        => Core.Config
         -> TxpConfiguration
         -> NodeResources ExplorerExtraModifier
         -> (Diffusion ExplorerProd -> ExplorerProd ())
         -> IO ()
-    runExplorerRealMode pm txpConfig nr@NodeResources{..} go =
+    runExplorerRealMode coreConfig txpConfig nr@NodeResources{..} go =
         let NodeContext {..} = nrContext
             extraCtx = makeExtraCtx
             explorerModeToRealMode  = runExplorerProd extraCtx
-         in runRealMode pm txpConfig nr $ \diffusion ->
+         in runRealMode coreConfig txpConfig nr $ \diffusion ->
                 explorerModeToRealMode (go (hoistDiffusion (lift . lift) explorerModeToRealMode diffusion))
 
     nodeArgs :: NodeArgs

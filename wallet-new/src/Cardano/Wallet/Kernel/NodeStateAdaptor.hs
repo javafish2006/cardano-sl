@@ -64,9 +64,8 @@ import           Pos.Chain.Update (ConfirmedProposalState,
 import qualified Pos.Chain.Update as Upd
 import           Pos.Context (NodeContext (..))
 import           Pos.Core (ProtocolConstants (pcK), SlotCount, Timestamp,
-                     genesisBlockVersionData, pcEpochSlots)
-import           Pos.Core.Configuration (HasConfiguration, genesisHash,
-                     protocolConstants)
+                     configEpochSlots, genesisBlockVersionData, pcEpochSlots)
+import           Pos.Core.Configuration (HasConfiguration, genesisHash)
 import           Pos.Core.Slotting (EpochIndex (..), HasSlottingVar (..),
                      LocalSlotIndex (..), MonadSlots (..), SlotId (..))
 import           Pos.Core.Txp (TxIn, TxOutAux)
@@ -327,7 +326,7 @@ instance ( NodeConstraints
   dbGetSerUndo  = DB.dbGetSerUndoRealDefault
   dbGetSerBlund  = DB.dbGetSerBlundRealDefault
 
-instance (NodeConstraints, MonadIO m) => MonadSlots Res (WithNodeState m) where
+instance MonadIO m => MonadSlots Res (WithNodeState m) where
   getCurrentSlot           = S.getCurrentSlotSimple
   getCurrentSlotBlocking   = S.getCurrentSlotBlockingSimple
   getCurrentSlotInaccurate = S.getCurrentSlotInaccurateSimple
@@ -342,17 +341,18 @@ instance (NodeConstraints, MonadIO m) => MonadSlots Res (WithNodeState m) where
 -- NOTE: This captures the node constraints in the closure so that the adaptor
 -- can be used in a place where these constraints is not available.
 newNodeStateAdaptor :: forall m ext. (NodeConstraints, MonadIO m, MonadMask m)
-                    => NodeResources ext
+                    => ProtocolConstants
+                    -> NodeResources ext
                     -> TVar NtpStatus
                     -> NodeStateAdaptor m
-newNodeStateAdaptor nr ntpStatus = Adaptor {
-      withNodeState            =            run
+newNodeStateAdaptor pc nr ntpStatus = Adaptor
+    { withNodeState            =            run
     , getTipSlotId             =            run $ \_lock -> defaultGetTipSlotId
     , getMaxTxSize             =            run $ \_lock -> defaultGetMaxTxSize
     , getSlotStart             = \slotId -> run $ \_lock -> defaultGetSlotStart slotId
     , getNextEpochSlotDuration =            run $ \_lock -> defaultGetNextEpochSlotDuration
-    , getSecurityParameter     = return $ pcK'         protocolConstants
-    , getSlotCount             = return $ pcEpochSlots protocolConstants
+    , getSecurityParameter     = return $ pcK'         pc
+    , getSlotCount             = return $ pcEpochSlots pc
     , curSoftwareVersion       = return $ Upd.curSoftwareVersion
     , compileInfo              = return $ Util.compileInfo
     , getNtpDrift              = defaultGetNtpDrift ntpStatus
@@ -504,7 +504,7 @@ instance Exception NodeStateUnavailable
 mockNodeState :: (HasCallStack, MonadThrow m)
               => MockNodeStateParams -> NodeStateAdaptor m
 mockNodeState MockNodeStateParams{..} =
-    withDefConfiguration $ \_pm ->
+    withDefConfiguration $ \coreConfig ->
     withDefUpdateConfiguration $
       Adaptor {
           withNodeState            = \_ -> throwM $ NodeStateUnavailable callStack
@@ -513,7 +513,7 @@ mockNodeState MockNodeStateParams{..} =
         , getNextEpochSlotDuration = return mockNodeStateNextEpochSlotDuration
         , getSlotStart             = return . mockNodeStateSlotStart
         , getMaxTxSize             = return $ bvdMaxTxSize genesisBlockVersionData
-        , getSlotCount             = return $ pcEpochSlots protocolConstants
+        , getSlotCount             = return $ configEpochSlots coreConfig
         , curSoftwareVersion       = return $ Upd.curSoftwareVersion
         , compileInfo              = return $ Util.compileInfo
         , getNtpDrift              = return . mockNodeStateNtpDrift
