@@ -75,3 +75,4 @@ library
 
   ghc-options:         -Wall
                        -O2
+                       -threaded

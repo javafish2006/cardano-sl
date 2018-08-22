@@ -16274,6 +16274,7 @@ license = stdenv.lib.licenses.mit;
 , cardano-sl-infra
 , cardano-sl-networking
 , cardano-sl-util
+, cardano-sl-util-test
 , conduit
 , containers
 , cpphs
@@ -16430,6 +16431,7 @@ cardano-sl-core
 cardano-sl-core-test
 cardano-sl-crypto
 cardano-sl-util
+cardano-sl-util-test
 containers
 cryptonite
 engine-io
@@ -16913,6 +16915,7 @@ license = stdenv.lib.licenses.mit;
 , cardano-sl-chain
 , cardano-sl-core
 , cardano-sl-util
+, cardano-sl-util-test
 , containers
 , contravariant
 , cryptonite
@@ -17016,6 +17019,7 @@ base
 binary
 bytestring
 cardano-sl-util
+cardano-sl-util-test
 containers
 hspec
 hspec-core
