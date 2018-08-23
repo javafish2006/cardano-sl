@@ -24,6 +24,7 @@ import qualified Cardano.Wallet.API.V1.Types as V1
 import           Cardano.Wallet.Kernel (PassiveWallet)
 import qualified Cardano.Wallet.Kernel.Diffusion as Kernel
 import qualified Cardano.Wallet.Kernel.Mode as Kernel
+import           Cardano.Wallet.Kernel.WalletException (WalletException)
 import qualified Cardano.Wallet.LegacyServer as LegacyServer
 import qualified Cardano.Wallet.Server as Server
 import           Cardano.Wallet.Server.CLI (NewWalletBackendParams (..),
@@ -161,7 +162,7 @@ legacyWalletBackend pm txpConfig WalletBackendParams {..} ntpStatus = pure $ \di
 
     exceptionHandler :: SomeException -> Response
     exceptionHandler se =
-        case asum [handleV1Errors se, handleV0Errors se] of
+        case asum [handleV1Errors se, handleWalletException <$> fromException se, handleV0Errors se] of
              Nothing -> handleGenericError se
              Just r  -> r
 
@@ -171,6 +172,10 @@ legacyWalletBackend pm txpConfig WalletBackendParams {..} ntpStatus = pure $ \di
         let reify (we :: V1.WalletError) =
                 responseLBS (V1.toHttpErrorStatus we) [applicationJson] .  encode $ we
         in fmap reify (fromException se)
+
+    handleWalletException :: WalletException -> Response
+    handleWalletException e =
+          responseLBS (V1.toHttpErrorStatus e) [applicationJson] .  encode $ e
 
     -- Handles domain-specific errors coming from the V0 API, but rewraps it
     -- into a jsend payload. It doesn't explicitly handle 'InternalError' or
