@@ -115,7 +115,6 @@ library
                        Cardano.Wallet.Kernel.Util
                        Cardano.Wallet.Kernel.Util.Core
                        Cardano.Wallet.Kernel.Util.StrictStateT
-                       Cardano.Wallet.Kernel.WalletException
                        Cardano.Wallet.Kernel.Wallets
                        Cardano.Wallet.LegacyServer
                        Cardano.Wallet.Orphans
@@ -142,6 +141,7 @@ library
                        Cardano.Wallet.WalletLayer.Kernel.Transactions
                        Cardano.Wallet.WalletLayer.Kernel.Wallets
                        Cardano.Wallet.WalletLayer.Kernel
+                       Cardano.Wallet.WalletLayer.Exception
                        Cardano.Wallet.WalletLayer.Error
 
   other-modules:       Paths_cardano_sl_wallet_new

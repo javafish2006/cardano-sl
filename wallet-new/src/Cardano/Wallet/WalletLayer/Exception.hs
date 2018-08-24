@@ -1,6 +1,6 @@
 {-# LANGUAGE ExistentialQuantification #-}
 
-module Cardano.Wallet.Kernel.WalletException
+module Cardano.Wallet.WalletLayer.Exception
     ( WalletException(..)
     , throwWalletM
     ) where
