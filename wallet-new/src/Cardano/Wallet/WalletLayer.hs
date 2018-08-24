@@ -1,3 +1,6 @@
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE LambdaCase    #-}
+
 module Cardano.Wallet.WalletLayer
     ( PassiveWalletLayer (..)
     , ActiveWalletLayer (..)
@@ -22,9 +25,12 @@ module Cardano.Wallet.WalletLayer
 
 import           Universum
 
+import           Data.Aeson (FromJSON (..), ToJSON (..))
 import           Formatting (bprint, build, formatToString, (%))
 import qualified Formatting.Buildable
+import           Generics.SOP.TH (deriveGeneric)
 import qualified Prelude
+import           Servant (err400, err404)
 import           Test.QuickCheck (Arbitrary (..), oneof)
 
 import           Pos.Chain.Block (Blund)
@@ -37,6 +43,11 @@ import           Cardano.Wallet.API.Request (RequestParams (..))
 import           Cardano.Wallet.API.Request.Filter (FilterOperations (..))
 import           Cardano.Wallet.API.Request.Sort (SortOperations (..))
 import           Cardano.Wallet.API.Response (SliceOf (..), WalletResponse)
+import           Cardano.Wallet.API.Response.JSend (HasDiagnostic (..))
+import           Cardano.Wallet.API.V1.Errors (ToHttpErrorStatus,
+                     ToServantError (..))
+import           Cardano.Wallet.API.V1.Generic (jsendErrorGenericParseJSON,
+                     jsendErrorGenericToJSON)
 import           Cardano.Wallet.API.V1.Types (Account, AccountBalance,
                      AccountIndex, AccountUpdate, Address, NewAccount,
                      NewAddress, NewWallet, NodeInfo, NodeSettings,
@@ -247,19 +258,39 @@ instance Buildable GetAccountError where
 data DeleteAccountError =
       DeleteAccountError (V1 Kernel.UnknownHdAccount)
     | DeleteAccountWalletIdDecodingFailed Text
-    deriving Eq
+    deriving (Generic, Eq)
+
+deriveGeneric ''DeleteAccountError
 
 -- | Unsound show instance needed for the 'Exception' instance.
 instance Show DeleteAccountError where
     show = formatToString build
-
-instance Exception DeleteAccountError
 
 instance Buildable DeleteAccountError where
     build (DeleteAccountError kernelError) =
         bprint ("DeleteAccountError " % build) kernelError
     build (DeleteAccountWalletIdDecodingFailed txt) =
         bprint ("DeleteAccountWalletIdDecodingFailed " % build) txt
+
+instance HasDiagnostic DeleteAccountError where
+    getDiagnosticKey (DeleteAccountError _) = "unknownAccount"
+    getDiagnosticKey (DeleteAccountWalletIdDecodingFailed _) = "message"
+
+instance ToServantError DeleteAccountError where
+    declareServantError = \case
+        DeleteAccountError _ -> err404
+        DeleteAccountWalletIdDecodingFailed _ -> err400
+
+instance ToHttpErrorStatus DeleteAccountError
+
+instance ToJSON DeleteAccountError where
+    toJSON = jsendErrorGenericToJSON
+
+instance FromJSON DeleteAccountError where
+    parseJSON = jsendErrorGenericParseJSON
+
+instance Exception DeleteAccountError
+
 
 data GetAccountsError =
       GetAccountsError Kernel.UnknownHdRoot

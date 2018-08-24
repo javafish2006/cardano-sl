@@ -1,42 +1,35 @@
 {-# LANGUAGE ExistentialQuantification #-}
 
-module Cardano.Wallet.Kernel.WalletException where
+module Cardano.Wallet.Kernel.WalletException
+    ( WalletException(..)
+    , throwWalletM
+    ) where
 
 import           Universum
 
-import           Data.Aeson (ToJSON, toJSON)
-import           Data.Typeable (cast)
-import           Formatting.Buildable (build)
-import           Prelude (show)
+import           Cardano.Wallet.API.Response.JSend (HasDiagnostic)
+import           Cardano.Wallet.API.V1.Errors (ToHttpErrorStatus)
 
-import           Cardano.Wallet.API.V1.Errors (ToHttpErrorStatus (..),
-                     ToServantError (..))
+import qualified Prelude
 
-data WalletException = forall e . (ToHttpErrorStatus e, Exception e, Buildable e) => WalletException e
 
--- FIXME: Generics somewhow?
+data WalletException = forall e.
+    ( Exception e
+    , HasDiagnostic e
+    , ToHttpErrorStatus e
+    ) => WalletException { getWalletException :: e }
 
-instance Show WalletException where
+instance Prelude.Show WalletException where
     show (WalletException e) = Prelude.show e
-
-instance ToJSON WalletException where
-    toJSON (WalletException e) = toJSON e
-
-instance ToHttpErrorStatus WalletException where
-    toHttpErrorStatus (WalletException e) = toHttpErrorStatus e
-
-instance ToServantError WalletException where
-    declareServantError (WalletException e) = declareServantError e
-
-instance Buildable WalletException where
-    build (WalletException e) = build e
 
 instance Exception WalletException
 
-walletExceptionToException :: (ToHttpErrorStatus e, Exception e) => e -> SomeException
-walletExceptionToException = toException . WalletException
-
-walletExceptionFromException :: Exception e => SomeException -> Maybe e
-walletExceptionFromException x = do
-    WalletException a <- fromException x
-    cast a
+-- | Wrap a wallet exception in a proper type that can be caught later
+throwWalletM ::
+    ( Exception e
+    , MonadThrow m
+    , HasDiagnostic e
+    , ToHttpErrorStatus e
+    ) => e -> m a
+throwWalletM =
+    throwM . WalletException

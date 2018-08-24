@@ -14,6 +14,8 @@ import           Cardano.Wallet.API.V1.Types
 import           Cardano.Wallet.WalletLayer (PassiveWalletLayer)
 import qualified Cardano.Wallet.WalletLayer as WalletLayer
 
+import           Cardano.Wallet.Kernel.WalletException (throwWalletM)
+
 handlers :: PassiveWalletLayer IO -> ServerT Accounts.API Handler
 handlers w =  deleteAccount w
          :<|> getAccount    w
@@ -30,7 +32,7 @@ deleteAccount :: PassiveWalletLayer IO
 deleteAccount layer wId accIdx = do
     res <- liftIO $ WalletLayer.deleteAccount layer wId accIdx
     case res of
-         Left e   -> throwM e
+         Left e   -> throwWalletM e
          Right () -> return NoContent
 
 -- | Fetches an 'Account' given its parent 'WalletId' and its index.

@@ -6,23 +6,17 @@ module Cardano.Wallet.Kernel.Accounts (
     , CreateAccountError(..)
     ) where
 
-import qualified Prelude
 import           Universum
 
-import           Formatting (bprint, build, formatToString, (%))
+import           Formatting (bprint, (%))
 import qualified Formatting as F
 import qualified Formatting.Buildable
 import           System.Random.MWC (GenIO, createSystemRandom, uniformR)
 
-import           Servant (err400)
-
 import           Data.Acid (update)
-import           Data.Aeson (ToJSON, toJSON)
 
 import           Pos.Crypto (EncryptedSecretKey, PassPhrase)
 
-import           Cardano.Wallet.API.V1.Errors (ToHttpErrorStatus (..),
-                     ToServantError (..))
 import           Cardano.Wallet.Kernel.DB.AcidState (CreateHdAccount (..), DB,
                      DeleteHdAccount (..), UpdateHdAccountName (..))
 import           Cardano.Wallet.Kernel.DB.HdWallet (AccountName (..),
@@ -37,8 +31,6 @@ import           Cardano.Wallet.Kernel.Internal (PassiveWallet, walletKeystore,
                      wallets)
 import qualified Cardano.Wallet.Kernel.Keystore as Keystore
 import           Cardano.Wallet.Kernel.Types (WalletId (..))
-import           Cardano.Wallet.Kernel.WalletException
-                     (walletExceptionFromException, walletExceptionToException)
 
 import           Test.QuickCheck (Arbitrary (..), oneof)
 
@@ -65,18 +57,6 @@ instance Buildable CreateAccountError where
     build (CreateAccountHdRndAccountSpaceSaturated hdAcc) =
         bprint ("CreateAccountHdRndAccountSpaceSaturated " % F.build) hdAcc
 
-instance ToJSON CreateAccountError where
-    toJSON = error "TODO"
-instance ToServantError CreateAccountError where
-    declareServantError _ = err400 -- FIXME: picked by random for now !!!!!!!!!!
-instance ToHttpErrorStatus CreateAccountError
-
-instance Show CreateAccountError where
-    show = formatToString build
-
-instance Exception CreateAccountError where
-    toException   = walletExceptionToException
-    fromException = walletExceptionFromException
 
 -- | Creates a new 'Account' for the input wallet.
 -- Note: @it does not@ generate a new 'Address' to go in tandem with this

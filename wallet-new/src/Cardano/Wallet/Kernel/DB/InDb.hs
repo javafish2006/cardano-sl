@@ -8,6 +8,7 @@ module Cardano.Wallet.Kernel.DB.InDb (
 import           Universum
 
 import           Control.Lens.TH (makeLenses)
+import           Data.Aeson (FromJSON (..), ToJSON (..))
 import           Data.SafeCopy (SafeCopy (..))
 
 import qualified Pos.Chain.Block as Core
@@ -29,6 +30,12 @@ instance Functor InDb where
 instance Applicative InDb where
   pure = InDb
   InDb f <*> InDb x = InDb (f x)
+
+instance ToJSON a => ToJSON (InDb a) where
+    toJSON = toJSON . _fromDb
+
+instance FromJSON a => FromJSON (InDb a) where
+    parseJSON = fmap InDb . parseJSON
 
 makeLenses ''InDb
 
