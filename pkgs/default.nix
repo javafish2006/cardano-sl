@@ -18096,6 +18096,7 @@ license = stdenv.lib.licenses.mit;
 , base
 , bytestring
 , cardano-sl-core-test
+, cardano-sl-util-test
 , cardano-sl-wallet
 , QuickCheck
 , serokell-util
@@ -18111,6 +18112,7 @@ libraryHaskellDepends = [
 base
 bytestring
 cardano-sl-core-test
+cardano-sl-util-test
 cardano-sl-wallet
 QuickCheck
 serokell-util
