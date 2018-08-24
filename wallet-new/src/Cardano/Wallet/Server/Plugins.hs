@@ -24,7 +24,6 @@ import qualified Cardano.Wallet.API.V1.Types as V1
 import           Cardano.Wallet.Kernel (PassiveWallet)
 import qualified Cardano.Wallet.Kernel.Diffusion as Kernel
 import qualified Cardano.Wallet.Kernel.Mode as Kernel
-import           Cardano.Wallet.Kernel.WalletException (WalletException (..))
 import qualified Cardano.Wallet.LegacyServer as LegacyServer
 import qualified Cardano.Wallet.Server as Server
 import           Cardano.Wallet.Server.CLI (NewWalletBackendParams (..),
@@ -32,6 +31,7 @@ import           Cardano.Wallet.Server.CLI (NewWalletBackendParams (..),
                      walletAcidInterval, walletDbOptions)
 import           Cardano.Wallet.WalletLayer (ActiveWalletLayer,
                      PassiveWalletLayer)
+import           Cardano.Wallet.WalletLayer.Exception (WalletException (..))
 import qualified Cardano.Wallet.WalletLayer.Kernel as WalletLayer.Kernel
 import qualified Pos.Wallet.Web.Error.Types as V0
 

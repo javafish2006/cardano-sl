@@ -14,7 +14,7 @@ import           Cardano.Wallet.API.V1.Types
 import           Cardano.Wallet.WalletLayer (PassiveWalletLayer)
 import qualified Cardano.Wallet.WalletLayer as WalletLayer
 
-import           Cardano.Wallet.Kernel.WalletException (throwWalletM)
+import           Cardano.Wallet.WalletLayer.Exception (throwWalletM)
 
 handlers :: PassiveWalletLayer IO -> ServerT Accounts.API Handler
 handlers w =  deleteAccount w

@@ -1,3 +1,6 @@
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE LambdaCase    #-}
+
 module Cardano.Wallet.Kernel.Wallets (
       createHdWallet
     , updateHdWallet
@@ -52,6 +55,25 @@ import           Test.QuickCheck (Arbitrary (..), oneof)
 data CreateWalletError =
       CreateWalletFailed HD.CreateHdRootError
       -- ^ When trying to create the 'Wallet', the DB operation failed.
+      deriving (Generic, Eq)
+
+deriveGeneric ''CreateWalletError
+
+instance HasDiagnostic CreateWalletError where
+    getDiagnosticKey = \case
+        CreateWalletFailed -> error "TODO"
+
+instance ToServantError CreateWalletError where
+    declareServantError = \case
+        CreateWalletFailed -> error "TODO"
+
+instance ToHttpErrorStatus CreateWalletError
+
+instance ToJSON CreateWalletError where
+    toJSON = jsendErrorGenericToJSON
+
+instance FromJSON CreateWalletError where
+    parseJSON = jsendErrorGenericParseJSON
 
 instance Arbitrary CreateWalletError where
     arbitrary = oneof []

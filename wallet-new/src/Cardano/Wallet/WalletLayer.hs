@@ -72,12 +72,27 @@ import           Cardano.Wallet.WalletLayer.ExecutionTimeLimit
 data CreateWalletError =
       CreateWalletError Kernel.CreateWalletError
     | CreateWalletFirstAccountCreationFailed Kernel.CreateAccountError
+    deriving (Generic, Eq)
 
--- | Unsound show instance needed for the 'Exception' instance.
-instance Show CreateWalletError where
-    show = formatToString build
+deriveGeneric ''CreateWalletError
 
-instance Exception CreateWalletError
+instance HasDiagnostic CreateWalletError where
+    getDiagnosticKey = \case
+        CreateWalletError -> error "TODO"
+        CreateWalletFirstAccountCreationFailed -> error "TODO"
+
+instance ToServantError CreateWalletError where
+    declareServantError = \case
+        CreateWalletError -> error "TODO"
+        CreateWalletFirstAccountCreationFailed -> error "TODO"
+
+instance ToHttpErrorStatus CreateWalletError
+
+instance ToJSON CreateWalletError where
+    toJSON = jsendErrorGenericToJSON
+
+instance FromJSON CreateWalletError where
+    parseJSON = jsendErrorGenericParseJSON
 
 instance Arbitrary CreateWalletError where
     arbitrary = oneof [ CreateWalletError <$> arbitrary
@@ -96,13 +111,29 @@ data GetWalletError =
     -- ^ Error thrown by the legacy wallet layer, isomorphic to the one above,
     -- which is new-data-layer specific.
     | GetWalletWalletIdDecodingFailed Text
-    deriving Eq
+    deriving (Generic, Eq)
 
--- | Unsound show instance needed for the 'Exception' instance.
-instance Show GetWalletError where
-    show = formatToString build
+deriveGeneric ''GetWalletError
 
-instance Exception GetWalletError
+instance HasDiagnostic GetWalletError where
+    getDiagnosticKey = \case
+        GetWalletError -> error "TODO"
+        GetWalletErrorNotFound -> error "TODO"
+        GetWalletWalletIdDecodingFailed -> error "TODO"
+
+instance ToServantError GetWalletError where
+    declareServantError = \case
+        GetWalletError -> error "TODO"
+        GetWalletErrorNotFound -> error "TODO"
+        GetWalletWalletIdDecodingFailed -> error "TODO"
+
+instance ToHttpErrorStatus GetWalletError
+
+instance ToJSON GetWalletError where
+    toJSON = jsendErrorGenericToJSON
+
+instance FromJSON GetWalletError where
+    parseJSON = jsendErrorGenericParseJSON
 
 instance Buildable GetWalletError where
     build (GetWalletError (V1 kernelError)) =
@@ -118,13 +149,29 @@ data UpdateWalletError =
     -- ^ Error thrown by the legacy wallet layer, isomorphic to the one above,
     -- which is new-data-layer specific.
     | UpdateWalletWalletIdDecodingFailed Text
-    deriving Eq
+    deriving (Generic, Eq)
 
--- | Unsound show instance needed for the 'Exception' instance.
-instance Show UpdateWalletError where
-    show = formatToString build
+deriveGeneric ''UpdateWalletError
 
-instance Exception UpdateWalletError
+instance HasDiagnostic UpdateWalletError where
+    getDiagnosticKey = \case
+        UpdateWalletError -> error "TODO"
+        UpdateWalletErrorNotFound -> error "TODO"
+        UpdateWalletWalletIdDecodingFailed -> error "TODO"
+
+instance ToServantError UpdateWalletError where
+    declareServantError = \case
+        UpdateWalletError -> error "TODO"
+        UpdateWalletErrorNotFound -> error "TODO"
+        UpdateWalletWalletIdDecodingFailed -> error "TODO"
+
+instance ToHttpErrorStatus UpdateWalletError
+
+instance ToJSON UpdateWalletError where
+    toJSON = jsendErrorGenericToJSON
+
+instance FromJSON UpdateWalletError where
+    parseJSON = jsendErrorGenericParseJSON
 
 instance Buildable UpdateWalletError where
     build (UpdateWalletError (V1 kernelError)) =
@@ -137,12 +184,27 @@ instance Buildable UpdateWalletError where
 data UpdateWalletPasswordError =
       UpdateWalletPasswordWalletIdDecodingFailed Text
     | UpdateWalletPasswordError Kernel.UpdateWalletPasswordError
+    deriving (Generic, Eq)
 
--- | Unsound show instance needed for the 'Exception' instance.
-instance Show UpdateWalletPasswordError where
-    show = formatToString build
+deriveGeneric ''UpdateWalletPasswordError
 
-instance Exception UpdateWalletPasswordError
+instance HasDiagnostic UpdateWalletPasswordError where
+    getDiagnosticKey = \case
+        UpdateWalletPasswordWalletIdDecodingFailed -> error "TODO"
+        UpdateWalletPasswordError -> error "TODO"
+
+instance ToServantError UpdateWalletPasswordError where
+    declareServantError = \case
+        UpdateWalletPasswordWalletIdDecodingFailed -> error "TODO"
+        UpdateWalletPasswordError -> error "TODO"
+
+instance ToHttpErrorStatus UpdateWalletPasswordError
+
+instance ToJSON UpdateWalletPasswordError where
+    toJSON = jsendErrorGenericToJSON
+
+instance FromJSON UpdateWalletPasswordError where
+    parseJSON = jsendErrorGenericParseJSON
 
 instance Buildable UpdateWalletPasswordError where
     build (UpdateWalletPasswordWalletIdDecodingFailed txt) =
@@ -153,12 +215,27 @@ instance Buildable UpdateWalletPasswordError where
 data DeleteWalletError =
       DeleteWalletWalletIdDecodingFailed Text
     | DeleteWalletError (V1 Kernel.UnknownHdRoot)
+    deriving (Generic, Eq)
 
--- | Unsound show instance needed for the 'Exception' instance.
-instance Show DeleteWalletError where
-    show = formatToString build
+deriveGeneric ''DeleteWalletError
 
-instance Exception DeleteWalletError
+instance HasDiagnostic DeleteWalletError where
+    getDiagnosticKey = \case
+        DeleteWalletWalletIdDecodingFailed _ -> error "TODO"
+        DeleteWalletError _ -> error "TODO"
+
+instance ToServantError DeleteWalletError where
+    declareServantError = \case
+        DeleteWalletWalletIdDecodingFailed _ -> error "TODO"
+        DeleteWalletError _ -> error "TODO"
+
+instance ToHttpErrorStatus DeleteWalletError
+
+instance ToJSON DeleteWalletError where
+    toJSON = jsendErrorGenericToJSON
+
+instance FromJSON DeleteWalletError where
+    parseJSON = jsendErrorGenericParseJSON
 
 instance Buildable DeleteWalletError where
     build (DeleteWalletWalletIdDecodingFailed txt) =
@@ -174,13 +251,27 @@ data CreateAddressError =
       CreateAddressError Kernel.CreateAddressError
     | CreateAddressAddressDecodingFailed Text
     -- ^ Decoding the input 'Text' as an 'Address' failed.
-    deriving Eq
+    deriving (Generic, Eq)
 
--- | Unsound show instance needed for the 'Exception' instance.
-instance Show CreateAddressError where
-    show = formatToString build
+deriveGeneric ''CreateAddressError
 
-instance Exception CreateAddressError
+instance HasDiagnostic CreateAddressError where
+    getDiagnosticKey = \case
+        CreateAddressError _ -> error "TODO"
+        CreateAddressAddressDecodingFailed _ -> error "TODO"
+
+instance ToServantError CreateAddressError where
+    declareServantError = \case
+        CreateAddressError _ -> error "TODO"
+        CreateAddressAddressDecodingFailed _ -> error "TODO"
+
+instance ToHttpErrorStatus CreateAddressError
+
+instance ToJSON CreateAddressError where
+    toJSON = jsendErrorGenericToJSON
+
+instance FromJSON CreateAddressError where
+    parseJSON = jsendErrorGenericParseJSON
 
 instance Arbitrary CreateAddressError where
     arbitrary = oneof [ CreateAddressError <$> arbitrary
@@ -199,13 +290,24 @@ data ValidateAddressError =
     -- 'Address' the decoding failed. Unfortunately we are not able to
     -- provide a more accurate error description as 'decodeTextAddress' doesn't
     -- offer such.
-    deriving Eq
+    deriving (Generic, Eq)
 
--- | Unsound show instance needed for the 'Exception' instance.
-instance Show ValidateAddressError where
-    show = formatToString build
+deriveGeneric ''ValidateAddressError
 
-instance Exception ValidateAddressError
+instance HasDiagnostic ValidateAddressError where
+    getDiagnosticKey = \case
+        ValidateAddressDecodingFailed _ -> error "TODO"
+
+instance ToServantError ValidateAddressError where
+    declareServantError = \case _ -> error "TODO"
+
+instance ToHttpErrorStatus ValidateAddressError
+
+instance ToJSON ValidateAddressError where
+    toJSON = jsendErrorGenericToJSON
+
+instance FromJSON ValidateAddressError where
+    parseJSON = jsendErrorGenericParseJSON
 
 instance Buildable ValidateAddressError where
     build (ValidateAddressDecodingFailed rawText) =
@@ -222,13 +324,29 @@ data CreateAccountError =
     | CreateAccountFirstAddressGenerationFailed Kernel.CreateAddressError
     -- ^ When trying to create the first 'Address' to go in tandem with this
     -- 'Account', the generation failed.
-    deriving Eq
+    deriving (Generic, Eq)
 
--- | Unsound show instance needed for the 'Exception' instance.
-instance Show CreateAccountError where
-    show = formatToString build
+deriveGeneric ''CreateAccountError
 
-instance Exception CreateAccountError
+instance HasDiagnostic CreateAccountError where
+    getDiagnosticKey = \case
+        CreateAccountError _ -> error "TODO"
+        CreateAccountWalletIdDecodingFailed _ -> error "TODO"
+        CreateAccountFirstAddressGenerationFailed _ -> error "TODO"
+
+instance ToServantError CreateAccountError where
+    declareServantError = \case
+        CreateAccountError _ -> error "TODO"
+        CreateAccountWalletIdDecodingFailed _ -> error "TODO"
+        CreateAccountFirstAddressGenerationFailed _ -> error "TODO"
+
+instance ToHttpErrorStatus CreateAccountError
+
+instance ToJSON CreateAccountError where
+    toJSON = jsendErrorGenericToJSON
+
+instance FromJSON CreateAccountError where
+    parseJSON = jsendErrorGenericParseJSON
 
 instance Buildable CreateAccountError where
     build (CreateAccountError kernelError) =
@@ -241,13 +359,29 @@ instance Buildable CreateAccountError where
 data GetAccountError =
       GetAccountError (V1 Kernel.UnknownHdAccount)
     | GetAccountWalletIdDecodingFailed Text
-    deriving Eq
+    deriving (Generic, Eq)
 
--- | Unsound show instance needed for the 'Exception' instance.
-instance Show GetAccountError where
-    show = formatToString build
 
-instance Exception GetAccountError
+
+deriveGeneric ''GetAccountError
+
+instance HasDiagnostic GetAccountError where
+    getDiagnosticKey = \case
+        GetAccountError _ -> error "TODO"
+        GetAccountWalletIdDecodingFailed _ -> error "TODO"
+
+instance ToServantError GetAccountError where
+    declareServantError = \case
+        GetAccountError _ -> error "TODO"
+        GetAccountWalletIdDecodingFailed _ -> error "TODO"
+
+instance ToHttpErrorStatus GetAccountError
+
+instance ToJSON GetAccountError where
+    toJSON = jsendErrorGenericToJSON
+
+instance FromJSON GetAccountError where
+    parseJSON = jsendErrorGenericParseJSON
 
 instance Buildable GetAccountError where
     build (GetAccountError kernelError) =
@@ -262,10 +396,6 @@ data DeleteAccountError =
 
 deriveGeneric ''DeleteAccountError
 
--- | Unsound show instance needed for the 'Exception' instance.
-instance Show DeleteAccountError where
-    show = formatToString build
-
 instance Buildable DeleteAccountError where
     build (DeleteAccountError kernelError) =
         bprint ("DeleteAccountError " % build) kernelError
@@ -273,8 +403,9 @@ instance Buildable DeleteAccountError where
         bprint ("DeleteAccountWalletIdDecodingFailed " % build) txt
 
 instance HasDiagnostic DeleteAccountError where
-    getDiagnosticKey (DeleteAccountError _) = "unknownAccount"
-    getDiagnosticKey (DeleteAccountWalletIdDecodingFailed _) = "message"
+    getDiagnosticKey = \case
+        DeleteAccountError _ -> "unknownAccount"
+        DeleteAccountWalletIdDecodingFailed _ -> "message"
 
 instance ToServantError DeleteAccountError where
     declareServantError = \case
@@ -289,19 +420,30 @@ instance ToJSON DeleteAccountError where
 instance FromJSON DeleteAccountError where
     parseJSON = jsendErrorGenericParseJSON
 
-instance Exception DeleteAccountError
-
-
 data GetAccountsError =
       GetAccountsError Kernel.UnknownHdRoot
     | GetAccountsWalletIdDecodingFailed Text
-    deriving Eq
+    deriving (Generic, Eq)
 
--- | Unsound show instance needed for the 'Exception' instance.
-instance Show GetAccountsError where
-    show = formatToString build
+deriveGeneric ''GetAccountsError
 
-instance Exception GetAccountsError
+instance HasDiagnostic GetAccountsError where
+    getDiagnosticKey = \case
+        GetAccountsError _                  -> "TODO"
+        GetAccountsWalletIdDecodingFailed _ -> "TODO"
+
+instance ToServantError GetAccountsError where
+    declareServantError = \case
+        GetAccountsError _ -> err404
+        GetAccountsWalletIdDecodingFailed _ -> err400
+
+instance ToHttpErrorStatus GetAccountsError
+
+instance ToJSON GetAccountsError where
+    toJSON = jsendErrorGenericToJSON
+
+instance FromJSON GetAccountsError where
+    parseJSON = jsendErrorGenericParseJSON
 
 instance Buildable GetAccountsError where
     build (GetAccountsError kernelError) =
@@ -312,13 +454,27 @@ instance Buildable GetAccountsError where
 data UpdateAccountError =
       UpdateAccountError (V1 Kernel.UnknownHdAccount)
     | UpdateAccountWalletIdDecodingFailed Text
-    deriving Eq
+    deriving (Generic, Eq)
 
--- | Unsound show instance needed for the 'Exception' instance.
-instance Show UpdateAccountError where
-    show = formatToString build
+deriveGeneric ''UpdateAccountError
 
-instance Exception UpdateAccountError
+instance HasDiagnostic UpdateAccountError where
+    getDiagnosticKey = \case
+        UpdateAccountError _ -> "unknownAccount"
+        UpdateAccountWalletIdDecodingFailed _ -> "message"
+
+instance ToServantError UpdateAccountError where
+    declareServantError = \case
+        UpdateAccountError _ -> err404
+        UpdateAccountWalletIdDecodingFailed _ -> err400
+
+instance ToHttpErrorStatus UpdateAccountError
+
+instance ToJSON UpdateAccountError where
+    toJSON = jsendErrorGenericToJSON
+
+instance FromJSON UpdateAccountError where
+    parseJSON = jsendErrorGenericParseJSON
 
 instance Buildable UpdateAccountError where
     build (UpdateAccountError kernelError) =
@@ -335,9 +491,31 @@ data GetTxError =
     | GetTxAddressDecodingFailed Text
     | GetTxInvalidSortingOperaration String
     | GetTxUnknownHdAccount Kernel.UnknownHdAccount
+    deriving (Generic, Eq)
 
-instance Show GetTxError where
-    show = formatToString build
+deriveGeneric ''UpdateAccountError
+
+instance HasDiagnostic GetTxError where
+    getDiagnosticKey = \case
+        GetTxMissingWalletIdError _ -> error "TODO"
+        GetTxAddressDecodingFailed _ -> error "TODO"
+        GetTxInvalidSortingOperaration _ -> error "TODO"
+        GetTxUnknownHdAccount _ -> error "TODO"
+
+instance ToServantError GetTxError where
+    declareServantError = \case
+        GetTxMissingWalletIdError _ -> error "TODO"
+        GetTxAddressDecodingFailed _ -> error "TODO"
+        GetTxInvalidSortingOperaration _ -> error "TODO"
+        GetTxUnknownHdAccount _ -> error "TODO"
+
+instance ToHttpErrorStatus GetTxError
+
+instance ToJSON GetTxError where
+    toJSON = jsendErrorGenericToJSON
+
+instance FromJSON GetTxError where
+    parseJSON = jsendErrorGenericParseJSON
 
 instance Buildable GetTxError where
     build GetTxMissingWalletIdError =
@@ -356,8 +534,6 @@ instance Arbitrary GetTxError where
                       , pure (GetTxInvalidSortingOperaration "123")
                       , GetTxUnknownHdAccount <$> arbitrary
                       ]
-
-instance Exception GetTxError
 
 ------------------------------------------------------------
 -- Passive wallet layer
@@ -476,12 +652,31 @@ data NewPaymentError =
     | NewPaymentTimeLimitReached TimeExecutionLimit
     | NewPaymentWalletIdDecodingFailed Text
     | NewPaymentUnknownAccountId Kernel.UnknownHdAccount
+    deriving (Generic, Eq)
 
--- | Unsound show instance needed for the 'Exception' instance.
-instance Show NewPaymentError where
-    show = formatToString build
+deriveGeneric ''NewPaymentError
 
-instance Exception NewPaymentError
+instance HasDiagnostic NewPaymentError where
+    getDiagnosticKey = \case
+        NewPaymentError _ -> error "TODO"
+        NewPaymentTimeLimitReached _ -> error "TODO"
+        NewPaymentWalletIdDecodingFailed _ -> error "TODO"
+        NewPaymentUnknownAccountId _ -> error "TODO"
+
+instance ToServantError NewPaymentError where
+    declareServantError = \case
+        NewPaymentError _ -> error "TODO"
+        NewPaymentTimeLimitReached _ -> error "TODO"
+        NewPaymentWalletIdDecodingFailed _ -> error "TODO"
+        NewPaymentUnknownAccountId _ -> error "TODO"
+
+instance ToHttpErrorStatus NewPaymentError
+
+instance ToJSON NewPaymentError where
+    toJSON = jsendErrorGenericToJSON
+
+instance FromJSON NewPaymentError where
+    parseJSON = jsendErrorGenericParseJSON
 
 instance Buildable NewPaymentError where
     build (NewPaymentError kernelErr) =
@@ -498,12 +693,29 @@ data EstimateFeesError =
       EstimateFeesError Kernel.EstimateFeesError
     | EstimateFeesTimeLimitReached TimeExecutionLimit
     | EstimateFeesWalletIdDecodingFailed Text
+    deriving (Generic, Eq)
 
--- | Unsound show instance needed for the 'Exception' instance.
-instance Show EstimateFeesError where
-    show = formatToString build
+deriveGeneric ''EstimateFeesError
 
-instance Exception EstimateFeesError
+instance HasDiagnostic EstimateFeesError where
+    getDiagnosticKey = \case
+        EstimateFeesError _ -> error "TODO"
+        EstimateFeesTimeLimitReached _ -> error "TODO"
+        EstimateFeesWalletIdDecodingFailed _ -> error "TODO"
+
+instance ToServantError EstimateFeesError where
+    declareServantError = \case
+        EstimateFeesError _ -> error "TODO"
+        EstimateFeesTimeLimitReached _ -> error "TODO"
+        EstimateFeesWalletIdDecodingFailed _ -> error "TODO"
+
+instance ToHttpErrorStatus EstimateFeesError
+
+instance ToJSON EstimateFeesError where
+    toJSON = jsendErrorGenericToJSON
+
+instance FromJSON EstimateFeesError where
+    parseJSON = jsendErrorGenericParseJSON
 
 instance Buildable EstimateFeesError where
     build (EstimateFeesError kernelErr) =
@@ -520,11 +732,23 @@ instance Arbitrary EstimateFeesError where
 
 -- | TODO: Will need to be extended
 data RedeemAdaError = RedeemAdaError
+    deriving (Generic, Eq)
 
-instance Show RedeemAdaError where
-    show = formatToString build
+deriveGeneric ''RedeemAdaError
 
-instance Exception RedeemAdaError
+instance HasDiagnostic RedeemAdaError where
+    getDiagnosticKey = error "TODO"
+
+instance ToServantError RedeemAdaError where
+    declareServantError = error "TODO"
+
+instance ToHttpErrorStatus RedeemAdaError
+
+instance ToJSON RedeemAdaError where
+    toJSON = jsendErrorGenericToJSON
+
+instance FromJSON RedeemAdaError where
+    parseJSON = jsendErrorGenericParseJSON
 
 instance Buildable RedeemAdaError where
     build RedeemAdaError = "RedeemAdaError"
